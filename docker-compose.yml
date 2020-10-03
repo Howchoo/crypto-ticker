@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  ticker:
+    build:
+      context: .
+    devices:
+      - "/dev/mem:/dev/mem"
+    privileged: true
+    env_file:
+      - ./settings.env
+    volumes:
+      - .:/code
