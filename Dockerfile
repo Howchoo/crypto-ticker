@@ -1,4 +1,4 @@
-FROM python:3.7.9-buster
+FROM balenalib/raspberry-pi-python:3.7.4
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -7,7 +7,7 @@ RUN mkdir /code
 WORKDIR /code
 
 RUN apt-get update && \
-    apt-get install -y git python3-dev python3-pillow && \
+    apt-get install -y build-essential git make python3-dev python3-pillow && \
     rm -rf /var/lib/apt/lists/*
 
 RUN cd /opt && \
