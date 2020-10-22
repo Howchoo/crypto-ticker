@@ -84,14 +84,11 @@ class Ticker(Frame):
 
         for symbol, data in items:
             try:
-                logger.info(symbol)
-                logger.info(data['quote']['USD'])
                 price = f"${data['quote']['USD']['price']:,.2f}"
-                change_1h = f"{round(data['quote']['USD']['percent_change_1h'], 1):.1}%"
-                logger.info(change_1h)
+                change_1h = f"{data['quote']['USD']['percent_change_1h']:.1f}%"
                 # Add + for positive changes
-                if not change_1h.startswith('-'):
-                    change_1h = '+{0}'.format(change_1h)
+                if change_1h.startswith('-'):
+                    change_1h = change_1h[1:]
             except KeyError:
                 # TODO: Add error logging
                 continue
