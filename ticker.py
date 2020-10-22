@@ -44,8 +44,8 @@ class Ticker(Frame):
             raise RuntimeError('CMC_API_KEY environment variable must be set.')
 
         # Get user settings
-        self.refresh_rate = os.environ.get('REFRESH_RATE', 600)  # 600s / 10m
-        self.sleep = os.environ.get('SLEEP', 3)  # 3s
+        self.refresh_rate = int(os.environ.get('REFRESH_RATE', 600))  # 600s / 10m
+        self.sleep = int(os.environ.get('SLEEP', 3))  # 3s
         self.api = (
             SANDBOX_API if os.environ.get('SANDBOX', '') == 'true' else PRODUCTION_API
         )
@@ -84,6 +84,7 @@ class Ticker(Frame):
 
         for symbol, data in items:
             try:
+                logger.info(data['quote']['USD'])
                 price = f"${data['quote']['USD']['price']:,.2f}"
                 change_1h = f"{data['quote']['USD']['percent_change_1h']:.1}%"
                 # Add + for positive changes
