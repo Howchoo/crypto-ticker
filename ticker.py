@@ -86,7 +86,7 @@ class Ticker(Frame):
             try:
                 logger.info(data['quote']['USD'])
                 price = f"${data['quote']['USD']['price']:,.2f}"
-                change_1h = f"{data['quote']['USD']['percent_change_1h']:.1}%"
+                change_1h = f"{round(data['quote']['USD']['percent_change_1h'], 1):.1}%"
                 # Add + for positive changes
                 if not change_1h.startswith('-'):
                     change_1h = '+{0}'.format(change_1h)
