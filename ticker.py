@@ -44,7 +44,7 @@ class Ticker(Frame):
             raise RuntimeError('CMC_API_KEY environment variable must be set.')
 
         # Get user settings
-        self.refresh_rate = int(os.environ.get('REFRESH_RATE', 600))  # 600s / 10m
+        self.refresh_rate = int(os.environ.get('REFRESH_RATE', 300))  # 300s or 5m
         self.sleep = int(os.environ.get('SLEEP', 3))  # 3s
         self.api = (
             SANDBOX_API if os.environ.get('SANDBOX', '') == 'true' else PRODUCTION_API
