@@ -1,29 +1,12 @@
 #!/usr/bin/env python3
 
 import itertools
-import json
-import logging
 import os
-import requests
-import sys
 import time
 
 from frame import Frame
 from rgbmatrix import graphics
-
-
-SANDBOX_API = 'https://sandbox-api.coinmarketcap.com'
-PRODUCTION_API = 'https://pro-api.coinmarketcap.com'
-
-
-# Set up the logger
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
-handler = logging.StreamHandler(sys.stdout)
-handler.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
+from price_apis import get_api_cls, logger
 
 
 class Ticker(Frame):
@@ -37,18 +20,13 @@ class Ticker(Frame):
         self._cached_price_data = None
         self._last_fetch_time = 0
 
-        # Confirm an API key is present
-        try:
-            self.api_key = os.environ['CMC_API_KEY']
-        except KeyError:
-            raise RuntimeError('CMC_API_KEY environment variable must be set.')
+        # Set up the API
+        api_cls = get_api_cls(os.environ.get('API', 'coingecko'))
+        self.api = api_cls(symbols=self.get_symbols())
 
         # Get user settings
         self.refresh_rate = int(os.environ.get('REFRESH_RATE', 300))  # 300s or 5m
         self.sleep = int(os.environ.get('SLEEP', 3))  # 3s
-        self.api = (
-            SANDBOX_API if os.environ.get('SANDBOX', '') == 'true' else PRODUCTION_API
-        )
 
         super().__init__(*args, **kwargs)
 
@@ -56,44 +34,8 @@ class Ticker(Frame):
         """Get the symbols to include"""
         symbols = os.environ.get('SYMBOLS')
         if not symbols:
-            return 'BTC,ETH'
+            return 'btc,eth'
         return symbols
-
-    def fetch_price_data(self):
-        """Fetch new price data from the API.
-
-        Returns:
-            A list of dicts that represent price data for a single asset. For example:
-
-            [{'symbol': .., 'price': .., 'change_1h': ..}]
-        """
-        logger.info('`fetch_price_data` called.')
-
-        response = requests.get(
-            '{0}/v1/cryptocurrency/quotes/latest'.format(self.api),
-            params={'symbol': self.get_symbols()},
-            headers={'X-CMC_PRO_API_KEY': self.api_key},
-        )
-        price_data = []
-
-        try:
-            items = response.json().get('data', {}).items()
-        except json.JSONDecodeError:
-            logger.error(f'JSON decode error: {response.text}')
-            return
-
-        for symbol, data in items:
-            try:
-                price = f"${data['quote']['USD']['price']:,.2f}"
-                change_1h = f"{data['quote']['USD']['percent_change_1h']:.1f}%"
-                # Add + for positive changes
-                if change_1h.startswith('-'):
-                    change_1h = change_1h[1:]
-            except KeyError:
-                # TODO: Add error logging
-                continue
-            price_data.append(dict(symbol=symbol, price=price, change_1h=change_1h))
-        return price_data
 
     @property
     def price_data(self):
@@ -104,7 +46,7 @@ class Ticker(Frame):
         if it's time to refresh data.
 
         Returns:
-            Updated price data. See self.fetch_price_data.
+            Updated price data. See self.api.fetch_price_data.
         """
         # Determine if the cache is stale
         cache_is_stale = (time.time() - self._last_fetch_time) > self.refresh_rate
@@ -115,7 +57,7 @@ class Ticker(Frame):
             return self._cached_price_data
 
         # Otherwise fetch new data and set the _last_fetch_time
-        price_data = self.fetch_price_data()
+        price_data = self.api.fetch_price_data()
         self._last_fetch_time = time.time()
         self._cached_price_data = price_data
 
@@ -143,7 +85,7 @@ class Ticker(Frame):
 
         # To right align, we have to calculate the width of the text
         change_width = sum(
-            [font_change.CharacterWidth(ord(c)) for c in asset['change_1h']]
+            [font_change.CharacterWidth(ord(c)) for c in asset['change_24h']]
         )
         change_x = 62 - change_width
 
@@ -151,7 +93,7 @@ class Ticker(Frame):
         main_color = graphics.Color(255, 255, 0)
         change_color = (
             graphics.Color(194, 24, 7)
-            if asset['change_1h'].startswith('-')
+            if asset['change_24h'].startswith('-')
             else graphics.Color(46, 139, 87)
         )
 
@@ -159,7 +101,7 @@ class Ticker(Frame):
         graphics.DrawText(canvas, font_symbol, 3, 12, main_color, asset['symbol'])
         graphics.DrawText(canvas, font_price, 3, 28, main_color, asset['price'])
         graphics.DrawText(
-            canvas, font_change, change_x, 10, change_color, asset['change_1h']
+            canvas, font_change, change_x, 10, change_color, asset['change_24h']
         )
 
         return canvas
