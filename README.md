@@ -11,3 +11,24 @@ Requires:
 See the Howchoo guide for installation and configuration instructions:
 
 https://howchoo.com/pi/raspberry-pi-cryptocurrency-ticker
+
+### Settings
+
+You can customize the application using the following settings:
+
+| Name | Default | Description |
+|--|--|--|
+| SYMBOLS | btc,eth | The asset symbols you want to track. |
+| API | coingecko | The API you want to use to fetch price data. Currently supported APIs are "coingecko" and "coinmarketcap". |
+| REFRESH_RATE | 300 | How often to refresh price data, in seconds. |
+| SLEEP | 3 | How long each asset price displays before rotating, in seconds. |
+| CMC\_API\_KEY | | The CoinMarketCap API key, required if you specified API=coinmarketcap. |
+| SANDBOX | | Used for CoinMarketCap only. Set SANDBOX=false if you're developing and want to use the sandbox API. |
+
+Example:
+
+```
+SYMBOLS=btc,eth,ltc,xrp
+API=coingecko
+```
+
