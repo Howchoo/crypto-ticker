@@ -8,4 +8,6 @@ Requires:
   * Raspberry Pi Zero WH
   * CoinMarketCap API Account
 
-See the Howchoo guide for installation and configuration instructions.
+See the Howchoo guide for installation and configuration instructions:
+
+https://howchoo.com/pi/raspberry-pi-cryptocurrency-ticker
