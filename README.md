@@ -14,7 +14,7 @@ https://howchoo.com/pi/raspberry-pi-cryptocurrency-ticker
 
 ### Settings
 
-You can customize the application using the following settings:
+You can customize the application by adding any of the following settings to your settings.env file in the root directory of this repo:
 
 | Name | Default | Description |
 |--|--|--|
