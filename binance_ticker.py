@@ -71,8 +71,18 @@ class BinanceTicker(Frame):
         font_change = graphics.Font()
         font_change.LoadFont('fonts/6x10.bdf')
 
+        priceChangePercent = float(symbol["priceChangePercent"])
+        weightedAvgPrice = float(symbol["weightedAvgPrice"])
+        
+        prefix = (
+            ''
+            if symbol['priceChangePercent'].startswith('-')
+            else '+'
+        )
+
+
         change_width = sum(
-            [font_change.CharacterWidth(ord(c)) for c in f'${float(symbol["priceChangePercent"]):.2f}']
+            [font_change.CharacterWidth(ord(c)) for c in f'{prefix}{priceChangePercent:.2f}']
         )
         change_x = 62 - change_width
 
@@ -86,9 +96,9 @@ class BinanceTicker(Frame):
 
         # Draw the elements on the canvas
         graphics.DrawText(canvas, font_symbol, 3, 12, main_color, key)
-        graphics.DrawText(canvas, font_price, 3, 28, main_color, f'${float(symbol["weightedAvgPrice"]):.2f}')
+        graphics.DrawText(canvas, font_price, 3, 28, main_color, f'{weightedAvgPrice:.2f}')
         graphics.DrawText(
-            canvas, font_change, change_x, 10, change_color, f'${float(symbol["priceChangePercent"]):.2f}'
+            canvas, font_change, change_x, 10, change_color, f'{prefix}{priceChangePercent:.2f}'
         )
 
         return canvas
