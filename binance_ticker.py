@@ -80,7 +80,7 @@ class BinanceTicker(Frame):
         font_change.LoadFont('fonts/6x10.bdf')
 
         priceChangePercent = float(symbol["priceChangePercent"])
-        weightedAvgPrice = float(symbol["weightedAvgPrice"])
+        price = float(symbol["price"])
         
         prefix = (
             ''
