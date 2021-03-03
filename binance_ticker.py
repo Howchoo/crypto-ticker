@@ -105,10 +105,7 @@ class BinanceTicker(Frame):
     def get_symbols(self):
         price_map_length = len(self.price_map)
         keys = list(self.price_map.keys())
-        self.logger.info(keys, keys)
-
         for index in itertools.cycle(range(price_map_length)):
-            self.logger.info('using index', index)
             try:
                 yield self.price_map[keys[index]]
             except IndexError:
@@ -126,13 +123,3 @@ class BinanceTicker(Frame):
 
 if __name__ == '__main__':
     BinanceTicker().process()
-
-        
-
-        
-
-    
-
-
-
-    
