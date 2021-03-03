@@ -52,7 +52,7 @@ class BinanceTicker(Frame):
         BASE_URL='https://api.binance.com/'
 
         for symbol in self.symbols.split(','):
-            response = requests.get(f'{BASE_URL}/api/v3/ticker/24hr?symbol={symbol.upper()}')
+            response = requests.get(f'{BASE_URL}api/v3/ticker/24hr?symbol={symbol.upper()}')
             data[symbol] = response.json()
         
         return data
