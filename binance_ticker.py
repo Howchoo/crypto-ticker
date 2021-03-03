@@ -58,6 +58,9 @@ class BinanceTicker(Frame):
         return data
         
     def get_ticker_canvas(self, key):
+        self.logger(key)
+        self.logger(self.price_map)
+        
         symbol = self.price_map[key]
         canvas = self.matrix.CreateFrameCanvas()
         canvas.Clear()
