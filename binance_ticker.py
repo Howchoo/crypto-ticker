@@ -53,7 +53,15 @@ class BinanceTicker(Frame):
 
         for symbol in self.symbols.split(','):
             response = requests.get(f'{BASE_URL}api/v3/ticker/24hr?symbol={symbol.upper()}BUSD')
-            data[symbol] = response.json()
+            obj = response.json()
+            data[symbol] = {
+                'priceChangePercent': obj['priceChangePercent'],
+                'volume': obj['volume'],
+                'price': 0.0
+            }
+            response = requests.get(f'{BASE_URL}/api/v3/ticker/price?symbol={symbol.upper()}BUSD')
+            obj = response.json()
+            data[symbol]['price'] = obj['price']
         
         return data
         
@@ -96,7 +104,7 @@ class BinanceTicker(Frame):
 
         # Draw the elements on the canvas
         graphics.DrawText(canvas, font_symbol, 3, 12, main_color, key)
-        graphics.DrawText(canvas, font_price, 3, 28, main_color, f'{weightedAvgPrice:.2f}')
+        graphics.DrawText(canvas, font_price, 3, 28, main_color, f'{price:.2f}')
         graphics.DrawText(
             canvas, font_change, change_x, 10, change_color, f'{prefix}{priceChangePercent:.2f}'
         )
