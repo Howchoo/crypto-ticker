@@ -58,9 +58,6 @@ class BinanceTicker(Frame):
         return data
         
     def get_ticker_canvas(self, key):
-        self.logger(key)
-        self.logger(self.price_map)
-        
         symbol = self.price_map[key]
         canvas = self.matrix.CreateFrameCanvas()
         canvas.Clear()
@@ -110,7 +107,7 @@ class BinanceTicker(Frame):
         keys = list(self.price_map.keys())
         for index in itertools.cycle(range(price_map_length)):
             try:
-                yield self.price_map[keys[index]]
+                yield keys[index]
             except IndexError:
                 yield None
 
