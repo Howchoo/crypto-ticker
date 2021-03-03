@@ -59,7 +59,7 @@ class BinanceTicker(Frame):
                 'volume': obj['volume'],
                 'price': 0.0
             }
-            response = requests.get(f'{BASE_URL}/api/v3/ticker/price?symbol={symbol.upper()}BUSD')
+            response = requests.get(f'{BASE_URL}api/v3/ticker/price?symbol={symbol.upper()}BUSD')
             obj = response.json()
             data[symbol]['price'] = obj['price']
         
