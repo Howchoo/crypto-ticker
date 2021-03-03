@@ -47,7 +47,7 @@ class BinanceTicker(Frame):
 
         return price_map
 
-    def get_24hour_change():
+    def get_24hour_change(self):
         data = {}
         BASE_URL='https://api.binance.com/'
 
