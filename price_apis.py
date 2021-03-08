@@ -32,8 +32,11 @@ def get_api_cls(api_name):
 class PriceAPI:
     """The base class for Price API"""
 
-    def __init__(self, symbols):
+    def __init__(self, symbols, currency):
         self.symbols = symbols
+        self.currency = currency
+
+        self.validate_currency(currency)
 
     def fetch_price_data(self):
         """Fetch new price data from the API.
@@ -44,6 +47,17 @@ class PriceAPI:
             [{'symbol': .., 'price': .., 'change_24h': ..}]
         """
         raise NotImplementedError
+
+    @property
+    def supported_currencies(self):
+        raise NotImplementedError
+
+    def validate_currency(self, currency):
+        supported = self.supported_currencies
+        if currency not in self.supported_currencies:
+            raise ValueError(
+                f"CURRENCY={currency} is not supported. Options are: {self.supported_currencies}."
+            )
 
 
 class CoinMarketCap(PriceAPI):
@@ -64,6 +78,10 @@ class CoinMarketCap(PriceAPI):
             if os.environ.get('SANDBOX', '') == 'true'
             else self.PRODUCTION_API
         )
+
+    @property
+    def supported_currencies(self):
+        return ["usd"]
 
     def fetch_price_data(self):
         """Fetch new price data from the CoinMarketCap API"""
@@ -113,6 +131,10 @@ class CoinGecko(PriceAPI):
 
         self.symbol_map = symbol_map
 
+    @property
+    def supported_currencies(self):
+        return ["usd", "eur"]
+
     def fetch_price_data(self):
         """Fetch new price data from the CoinGecko API"""
         logger.info('`fetch_price_data` called.')
@@ -123,7 +145,7 @@ class CoinGecko(PriceAPI):
             f'{self.API}/simple/price',
             params={
                 'ids': ','.join(list(self.symbol_map.keys())),
-                'vs_currencies': 'usd',
+                'vs_currencies': self.currency,
                 'include_24hr_change': 'true',
             },
         )
@@ -131,10 +153,14 @@ class CoinGecko(PriceAPI):
 
         logger.info(response.json())
 
+        cur = self.currency
+        cur_change = f"{cur}_24h_change"
+        cur_symbol = "€" if cur == "eur" else "$"
+
         for coin_id, data in response.json().items():
             try:
-                price = f"${data['usd']:,.2f}"
-                change_24h = f"{data['usd_24h_change']:.1f}%"
+                price = f"{cur_symbol}{data[cur]:,.2f}"
+                change_24h = f"{data[cur_change]:.1f}%"
             except KeyError:
                 continue
 
