@@ -32,7 +32,7 @@ def get_api_cls(api_name):
 class PriceAPI:
     """The base class for Price API"""
 
-    def __init__(self, symbols):
+    def __init__(self, symbols, currency='usd'):
         self._symbols = symbols
         self.currency = currency
         self.validate_currency(currency)
