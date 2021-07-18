@@ -34,8 +34,8 @@ SYMBOLS=btc,eth,ltc,xrp
 API=coingecko
 ```
 
-Note: Some symbols are ambiguous. For example, `uni` currently corresponds to three difference currencies in the CoinGecko API. To specify the
-currency or token you want, you can use the following:
+Note: Some symbols are ambiguous. For example, `uni` currently corresponds to three different currencies in the CoinGecko API. To specify the
+currency or token you want (with CoinGecko only), you can use the following:
 
 ```
 SYMBOLS=btc,eth,uni:uniswap
