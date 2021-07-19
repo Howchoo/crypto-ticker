@@ -33,3 +33,13 @@ Example:
 SYMBOLS=btc,eth,ltc,xrp
 API=coingecko
 ```
+
+Note: Some symbols are ambiguous. For example, `uni` currently corresponds to three different currencies in the CoinGecko API. To specify the
+currency or token you want (with CoinGecko only), you can use the following:
+
+```
+SYMBOLS=btc,eth,uni:uniswap
+```
+
+The second value (uniswap) corresponds to the ID of the currency in the API. This is currently only supported for the CoinGecko API. You can
+find the CoinGecko ID for a token in the URL. E.g. https://www.coingecko.com/en/coins/uniswap.

@@ -32,11 +32,22 @@ def get_api_cls(api_name):
 class PriceAPI:
     """The base class for Price API"""
 
-    def __init__(self, symbols, currency):
-        self.symbols = symbols
+    def __init__(self, symbols, currency='usd'):
+        self._symbols = symbols
         self.currency = currency
-
         self.validate_currency(currency)
+
+    def get_symbols(self):
+        """Get a list of symbols needed"""
+        return [s.split(':')[0] for s in self._symbols.split(',')]
+
+    def get_name_for_symbol(self, symbol):
+        """Return the name for the symbol, if specified"""
+        for sym in self._symbols.split(','):
+            sym_split = sym.split(':')
+            if symbol == sym_split[0]:
+                return sym_split[1] if len(sym_split) == 2 else None
+        return None
 
     def fetch_price_data(self):
         """Fetch new price data from the API.
@@ -89,7 +100,7 @@ class CoinMarketCap(PriceAPI):
 
         response = requests.get(
             '{0}/v1/cryptocurrency/quotes/latest'.format(self.api),
-            params={'symbol': self.symbols},
+            params={'symbol': self.get_symbols()},
             headers={'X-CMC_PRO_API_KEY': self.api_key},
         )
         price_data = []
@@ -124,9 +135,16 @@ class CoinGecko(PriceAPI):
         # The CoinGecko API uses ids to fetch price data
         symbol_map = {}
 
+        # Symbols is the list of symbols we want to fetch data for
+        symbols = self.get_symbols()
+
         for coin in response.json():
             symbol = coin['symbol']
-            if symbol in self.symbols.split(','):
+            # If we specified a name for our symbol, check for it
+            name = self.get_name_for_symbol(symbol)
+            if name is not None and name != coin['id']:
+                continue
+            if symbol in symbols:
                 symbol_map[coin['id']] = symbol
 
         self.symbol_map = symbol_map
@@ -161,7 +179,8 @@ class CoinGecko(PriceAPI):
             try:
                 price = f"{cur_symbol}{data[cur]:,.2f}"
                 change_24h = f"{data[cur_change]:.1f}%"
-            except KeyError:
+            except (KeyError, TypeError):
+                logging.warn(f'api data not complete for {0}: {1}', coin_id, data)
                 continue
 
             price_data.append(
